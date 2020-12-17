@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+  <h2>{{ object.title }}</h2>
+  <h2>127.0.0.1:8000/{{ object.slug }}</h2>
+  <p>{{ object.description }}</p>
+  <p>{{ object.owner.user.first_name }} {{ object.owner.user.last_name }}</p>
+
+  
+<p><a class='like-btn' 
+  data-href='{{ object.get_page_like_api_url }}' 
+  data-likes='{{ object.likes.count }}' 
+  href='{{ object.get_page_like_url }}'>
+  {{ object.likes.count }} 
+  {% if request.user.profile in object.likes.all %}Unlike{% else %}Like{% endif %}
+</a></p>
+
+
+<!-- Users that like a post (THis should be in a popup modal)-->
+
+{% comment %}
+<div class="bg-primary">
+  <h2>People Who like {{object.title}}</h2>
+  
+{% for profile in object.likes.all %}
+<p>{{ profile.user.first_name }} {{ profile.user.last_name }}</p>
+</div>
+{% endfor %}
+{% endcomment %}
+<!-- end Users that like a post -->
+
+
+  {% if object.owner == user.profile %}
+  <a href="{% url 'page:page-update-view' object.slug %}">Update</a><br><br><br><br>
+  <a href="{% url 'page:page-delete-view' object.slug %}">Delete</a>
+  {% endif %}
+
+  {% if request.user.profile == page.owner %}
+  <form method="post" enctype="multipart/form-data" type="block">
+    {% csrf_token %}
+    {{ form|crispy }}
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  {% endif %}
+  <div>
+    <h2>Posts</h2>
+    {% for post in page.posts.all %}
+    By - <b>{{post.author.user.first_name}} {{post.author.user.last_name}}</b><br>
+    {{post.content}}<br>
+    {{post.date_created}}
+    <div>
+    <p><a class='page-post-like-btn' data-href='{{ post.get_page_post_like_api_url }}' 
+      data-likes='{{ post.likes.count }}'  
+      href='{{ post.get_page_post_like_url }}'>{{ post.likes.count }}
+      
+      {% if request.user.profile in post.likes.all %}
+          Unlike
+      {% else %}
+          Like
+      {% endif %}
+  </a></p>
+</div>
+    <hr>
+    {% endfor %}
+  </div>
+</div>
+
+
+{% include 'page/snippets/page_like.html' %}
+{% include 'snippets/prevent_page_reload.html' %}
+{% endblock content %}

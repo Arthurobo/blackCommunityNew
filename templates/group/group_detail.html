@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+.post-container {
+  padding-left: 200px;
+  padding-right: 200px;
+}
+
+.author-name {
+  text-align: left;
+}
+</style>
+<div class="container">
+  <h2>{{ object.name }}</h2>
+  <p>{{ object.description }}</p>
+  <p>{{ object.id }}</p>
+
+  <p><a class='follow-btn' 
+    data-href='{{ object.get_group_follow_api_url }}' 
+    data-likes='{{ object.follows.count }}' 
+    href='{{ object.get_group_follow_url }}'>
+    {{ object.follows.count }} 
+    {% if request.user.profile in object.follows.all %}Unfollow{% else %}Follow{% endif %}
+  </a></p>
+
+  <form method="post" enctype="multipart/form-data" type="block">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+  <div class="container post-container">
+    {% for post in group.group_posts.all %}
+    <div class="col-md-12 infinite-item">
+      <!-- <img class="img-fluid" src="https://picsum.photos/700"> -->
+      
+        <div class="card mb-4 box-shadow">
+          <div class="card-body">
+
+            <div class="d-flex justify-content-between">
+              <div>
+                <img class="d-block border border-dark rounded-circle img-fluid mx-auto profile-image" 
+                    alt="codingwithmitch logo" 
+                    id="id_profile_image" 
+                    src="{{post.author.user.profile_image.url}}" width="50px">
+              </div>
+              
+              <a href="{% url 'account:user-account-view' user_id=post.author.user.pk %}">
+                <small class="text-muted author-name"><b>{{post.author.user.first_name}} {{post.author.user.last_name}}</b></small>
+            </a>
+              <small class="text-muted">{{post.date_created}}</small>
+            </div>
+            <div class="d-flex align-items-center">
+              <p>{{post.content}}</p>
+            </div>
+            <div>
+            <p><a class='like-btn' data-href='{{ post.get_group_post_like_api_url }}' 
+              data-likes='{{ post.likes.count }}'  
+              href='{{ post.get_group_post_like_url }}'>{{ post.likes.count }}
+              
+              {% if request.user.profile in post.likes.all %}
+                  Unlike
+              {% else %}
+                  Like
+              {% endif %}
+          </a></p>
+        </div>
+          </div>
+        </div>
+      
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+
+
+{% include 'group/snippets/group_follow.html' %}
+{% include 'snippets/prevent_page_reload.html' %}
+{% endblock content %}

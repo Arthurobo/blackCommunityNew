@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<style type="text/css">
+    .image-container {
+        max-width: 250px;
+        height: auto;
+        position: relative;
+    }
+
+    .field-heading {
+        color: #737373;
+    }
+
+    #id_confirm {
+        color: green;
+    }
+
+    #id_confirm:hover {
+        opacity: 0.3;
+    }
+
+    #id_cancel:hover {
+        opacity: 0.3;
+    }
+
+    #id_cancel {
+        color: red;
+    }
+
+    .material-icons {
+        font-size: 30px;
+    }
+
+    .material-icons:hover {
+        cursor: pointer;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="card profile-card">
+            <div class="card-body">
+                <div class="d-flex flex-column justify-content-center p-4">
+                    
+                    <form class="form-signin" method="post">{% csrf_token %}
+                        <h6 class="mt-4 field-heading">Username</h6>
+                        <input type="text" name="bio" id="id_input_username" class="form-control" 
+                                placeholder="Bio" required value="{{form.initial.bio}}">
+
+                        <h6 class="mt-4 field-heading">Phone Number</h6>
+                        <input type="text" name="phone_number" id="id_input_username" class="form-control" 
+                                placeholder="Phone Number" required value="{{form.initial.phone_number}}">
+
+                        <h6 class="mt-4 field-heading">Country Of Orign</h6>
+                        <input type="text" name="country_of_origin" id="id_input_username" class="form-control" 
+                                placeholder="Country of Origin" required value="{{form.initial.country_of_origin}}">
+
+                
+                        <h6 class="mt-4 field-heading">State of Origin</h6>
+                        <input type="text" name="state_of_origin" id="id_input_username" class="form-control" 
+                                placeholder="State of Origin" required value="{{form.initial.state_of_origin}}">
+                
+                        <h6 class="mt-4 field-heading">Tribe</h6>
+                        <input type="text" name="tribe" id="id_input_username" class="form-control" 
+                                placeholder="Tribe" required value="{{form.initial.tribe}}">
+                                
+                        <h6 class="mt-4 field-heading">Country of Residence</h6>
+                        <input type="text" name="country_of_residence" id="id_input_username" class="form-control" 
+                                placeholder="Country Of Residence" required value="{{form.initial.country_of_residence}}">
+                                
+
+                                
+                        <h6 class="mt-4 field-heading">State of Residence</h6>
+                        <input type="text" name="state_of_residence" id="id_input_username" class="form-control" 
+                                placeholder="State Of Residence" required value="{{form.initial.state_of_residence}}">
+                                
+                                
+                        <h6 class="mt-4 field-heading">City of Residence</h6>
+                        <input type="text" name="city_of_residence" id="id_input_username" class="form-control" 
+                                placeholder="City Of Residence" required value="{{form.initial.city_of_residence}}">
+                                
+                        <h6 class="mt-4 field-heading">Address Location</h6>
+                        <input type="text" name="address_location" id="id_input_username" class="form-control" 
+                                placeholder="Address Location" required value="{{form.initial.address_location}}">
+                                
+                                
+                        <h6 class="mt-4 field-heading">Tribes Intrested in</h6>
+                        <input type="text" name="tribes_intrested_in" id="id_input_username" class="form-control" 
+                                placeholder="Tribes Intrested in" required value="{{form.initial.tribes_intrested_in}}">
+
+
+                        <button class="mt-4 btn btn-primary flex-grow-1" type="submit">Save</button>
+                </div>
+
+                </form>
+                {% for field in form %}
+                    <p>
+                        {% for error in field.errors %}
+                    <p style="color: red">{{ error }}</p>
+                    {% endfor %}
+                    </p>
+                    {% endfor %}
+                    {% if form.non_field_errors %}
+                    <div style="color: red">
+                        <p>{{form.non_field_errors}}</p>
+                    </div>
+
+                    {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<script type="text/javascript">
+    function readURL(imageUrl) {
+        // TODO
+    }
+</script>
+
+
+{% endblock content %}

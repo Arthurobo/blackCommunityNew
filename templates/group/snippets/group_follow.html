@@ -1,0 +1,94 @@
+<!-- Ajax for group follow -->
+<script>
+    $(document).ready(function(){
+         function updateText(btn, newCount, verb){
+         btn.text(newCount + " " + verb)
+     }
+  
+     $(".follow-btn").click(function(e){
+       e.preventDefault()
+       var this_ = $(this)
+       var badge = this_.find('.unlike-update')
+       var followUrl = this_.attr("data-href")
+       var followCount = parseInt(this_.attr("data-follows")) | 0
+       var addFollow = followCount + 1
+       var removeFollow = followCount - 1
+       if (followUrl){
+          $.ajax({
+           url: followUrl,
+           method: "GET",
+           data: {},
+           success: function(data){
+             console.log(data)
+             var newFollows;
+             if (data.followed){
+                //  updateText(this_, addLike, "Unlike")
+                //  updateText(this_, data.likescount, badge)
+                 updateText(this_, data.followscount, "Unfollow")
+             } else {
+                //  updateText(this_, removeLike, "Like")
+                 updateText(this_, data.followscount, "Follow")
+                 // remove one like
+             }
+  
+           }, error: function(error){
+             console.log(error)
+             console.log("error")
+           }
+         })
+       }
+      
+     })
+  })
+  
+   </script>
+<!-- End of Ajax for group follow -->
+
+
+<!-- Ajax for group post like -->
+
+<script>
+  $(document).ready(function(){
+       function updateText(btn, newCount, verb){
+       btn.text(newCount + " " + verb)
+   }
+
+   $(".like-btn").click(function(e){
+     e.preventDefault()
+     var this_ = $(this)
+     var badge = this_.find('.unlike-update')
+     var likeUrl = this_.attr("data-href")
+     var likeCount = parseInt(this_.attr("data-likes")) | 0
+     var addLike = likeCount + 1
+     var removeLike = likeCount - 1
+     if (likeUrl){
+        $.ajax({
+         url: likeUrl,
+         method: "GET",
+         data: {},
+         success: function(data){
+           console.log(data)
+           var newLikes;
+           if (data.liked){
+              //  updateText(this_, addLike, "Unlike")
+              //  updateText(this_, data.likescount, badge)
+               updateText(this_, data.likescount, "Unlike")
+           } else {
+              //  updateText(this_, removeLike, "Like")
+               updateText(this_, data.likescount, "Like")
+               // remove one like
+           }
+
+         }, error: function(error){
+           console.log(error)
+           console.log("error")
+         }
+       })
+     }
+    
+   })
+})
+
+ </script>
+ 
+<!-- End of Ajax for group post like -->

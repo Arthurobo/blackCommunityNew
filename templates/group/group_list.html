@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+    {% block content %}
+    {% load static %}
+    <div class="container" style="max-width:700px">
+        <div class="px-3 pt-md-5 pb-md-4 mx-auto text-center">
+            <h1 class="display-4">All Groups</h1>
+            <p class="lead">List of groups</p>
+        </div>
+        <div class="">
+            <div class="row infinite-container">
+                {% for group in groups %}
+                <div class="col-md-12 infinite-item">
+                    <!-- <img class="img-fluid" src="https://picsum.photos/700"> -->
+                    <a class="text-dark" href="{{ group.get_absolute_url }}">
+                        <div class="card mb-4 box-shadow">
+                            <div class="card-body">
+                                <h2 style="font-size:18px;font-weight:bold;min-height:42px;">
+                                    {{group.name|truncatechars:50}}</h2>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{group.owner}}</small>
+                                    <small class="text-muted">{{group.date_created}}</small>
+                                </div>
+
+                                <p><a class='follow-btn' data-href='{{ group.get_group_follow_api_url }}' 
+                                    data-likes='{{ page.likes.count }}'  
+                                    href='{{ group.get_group_follow_url }}'>{{ group.follows.count }}
+                                    
+                                    {% if request.user.profile in group.follows.all %}
+                                        Unfollow
+                                    {% else %}
+                                        Follow
+                                    {% endif %}
+                                </a></p>
+                            </div>
+                        </div>     
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- For now this loading spinner isn't showing cos i want it to be like Facebook's 
+                which doesn't show a loading spinner -->
+            {% comment %}
+            <div class="d-flex d-none position-fixed" style="top:35vh;left:46vw">
+              <button class="btn btn-primary loading">
+                  <span class="spinner-border spinner-border-sm"></span>
+                  Loading...
+              </button>
+          </div>
+          {% endcomment %}
+          <!-- End of comment for loading spinner -->
+          
+            <div class="row">
+                <div class="col-12">
+                    {% if page_obj.has_next %}
+                    <a class="infinite-more-link" href="?page={{ page_obj.next_page_number }}"></a>
+                    {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="{% static "js/jquery.waypoints.min.js" %}"></script>
+    <script src="/static/js/infinite.min.js"></script>
+    <script>
+        var infinite = new Waypoint.Infinite({
+            element: $('.infinite-container')[0],
+            
+
+            offset: 'bottom-in-view',
+
+            onBeforePageLoad: function () {
+                $('.loading').show();
+            },
+            onAfterPageLoad: function () {
+                $('.loading').hide();
+            }
+
+        });
+    </script>
+
+
+
+{% include 'group/snippets/group_follow.html' %}
+    {% endblock %}

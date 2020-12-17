@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+  
+<div>
+  <a href="{% url 'page:page-create-view' %}">
+    <h4>Create new page</h4>
+</a>
+</div>
+
+<h1>Pages</h1>
+{% for page in object_list %}
+
+
+  <ul>
+    <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+    
+
+    <p><a class='like-btn' data-href='{{ page.get_page_like_api_url }}' 
+      data-likes='{{ page.likes.count }}'  
+      href='{{ page.get_page_like_url }}'>{{ page.likes.count }}
+      
+      {% if request.user.profile in page.likes.all %}
+          Unlike
+      {% else %}
+          Like
+      {% endif %}
+  </a></p>
+  </ul><hr>
+   
+{% endfor %}
+
+{% include 'page/snippets/page_like.html' %}
+{% endblock content %}
