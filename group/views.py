@@ -3,8 +3,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from .models import Group, Post
-from .forms import GroupCreateForm, GroupPostCreateForm
+from .models import Group, Post, Comment
+from .forms import GroupCreateForm, GroupPostCreateForm, GroupPostCommentForm
 from django.urls import reverse_lazy, reverse
 from account.models import Profile
 from django.http import HttpResponse, HttpResponseRedirect
@@ -59,6 +59,7 @@ class GroupDetailView(LoginRequiredMixin, FormMixin, DetailView):
     model = Group
     template_name = 'group/group_detail.html'
     form_class = GroupPostCreateForm
+    second_form_class = GroupPostCommentForm
 
     def get_success_url(self):
         return reverse('group:group-detail-view', kwargs={'pk': self.object.pk}) 
@@ -165,6 +166,53 @@ class GroupPostLikeAPIToggle(APIView):
         }
         return Response(data)
 
+
 class GroupPostDetailView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = 'group/post_detail.html'
+
+
+class GroupPostCommentLikeToggle(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        id_ = self.kwargs.get("id")
+        obj = get_object_or_404(Comment, id=id_)
+        url_ = obj.get_absolute_url()
+        user = self.request.user.profile
+        if self.request.user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+            else:
+                obj.likes.add(user)
+        return url_
+
+
+class GroupPostCommentLikeAPIToggle(APIView):
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, id=None, format=None):
+        obj = get_object_or_404(Comment, id=id)
+        url_ = obj.get_absolute_url()
+        user = self.request.user.profile
+        updated = False
+        liked = False
+        if self.request.user.is_authenticated:
+            if user in obj.likes.all():
+                liked = False
+                obj.likes.remove(user)
+            else:
+                liked = True
+                obj.likes.add(user)
+            updated = True
+        counts = obj.likes.count()
+        data = {
+            "updated": updated,
+            "liked": liked,
+            "likescount": counts
+        }
+        return Response(data)
+
+
+class GroupPostCommentDetailView(LoginRequiredMixin, DetailView):
+    model = Comment
+    template_name = 'group/post_comment_detail.html'

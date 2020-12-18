@@ -12,6 +12,9 @@
 .author-name {
   text-align: left;
 }
+.comment-box {
+    display: none;
+}
 </style>
 <div class="container">
   <h2>{{ object.name }}</h2>
@@ -38,14 +41,16 @@
       <!-- <img class="img-fluid" src="https://picsum.photos/700"> -->
       
         <div class="card mb-4 box-shadow">
-          <div class="card-body">
+          <div class="card-body container">
 
             <div class="d-flex justify-content-between">
               <div>
+                <a href="{% url 'account:user-account-view' user_id=post.author.user.pk %}">
                 <img class="d-block border border-dark rounded-circle img-fluid mx-auto profile-image" 
                     alt="codingwithmitch logo" 
                     id="id_profile_image" 
                     src="{{post.author.user.profile_image.url}}" width="50px">
+                    </a>
               </div>
               
               <a href="{% url 'account:user-account-view' user_id=post.author.user.pk %}">
@@ -68,6 +73,78 @@
               {% endif %}
           </a></p>
         </div>
+        
+          <!-- start of comment -->
+          <!-- Checking for the total count of comments and giving a good condition for comment display -->
+          <div class="container">
+          {% if post.total_number_of_comments >= 2 %}
+              <button class="cmt-btn btn-primary btn-sm mb-2">
+                {{post.total_number_of_comments}} Comments
+              </button>
+            
+          
+          {% elif post.total_number_of_comments == 1 %}
+            <button class="cmt-btn btn-primary btn-sm mb-2">
+              {{post.total_number_of_comments}} Comment
+            </button>
+
+          {% else %}
+          <button class="btn-primary btn-sm mb-2">
+            {{post.total_number_of_comments}} Comments
+          </button>
+          {% endif %}
+
+
+            <div class="comment-box">                
+          <form action="" method="POST"class='ui fluid form'>
+              {% csrf_token %}
+              <input type="hidden" name="post_id" value={{obj.id}}>
+              <input type="text" placeholder="Add Comment...">
+              {{ c_form }}
+              <button type="submit" name="submit_c_form" class="btn btn-primary btn-sm">Send</button>
+          </form>
+              {% if post.comment_set.all %}
+          {% for comment in post.comment_set.all %}
+              <div class="pl-3">
+                <a href="{% url 'account:user-account-view' user_id=comment.user.user.id %}">
+                  <img class="rounded-circle img-fluid" src="{{comment.user.user.profile_image.url}}" width="30px">
+                  <span>
+                    <b>{{ comment.user.user.first_name }} {{ comment.user.user.last_name }}</b>
+                  </a>
+                    <span>{{ comment.date_created|timesince }} ago</span>
+                  </span>
+                  <div class=''>{{ comment.body }}</div>
+                  <!-- Beginning of Comment Likes -->
+                  <div>
+                  <p><a class='comment-like-btn' data-href='{{ comment.get_group_post_comment_like_api_url }}' 
+                    data-likes='{{ comment.likes.count }}'  
+                    href='{{ post.get_group_post_comment_like_url }}'>{{ comment.likes.count }}
+                    
+                    {% if request.user.profile in comment.likes.all %}
+                        Unlike
+                    {% else %}
+                        Like
+                    {% endif %}
+                </a></p>
+              </div>
+              <!-- End of Comment Likes -->
+              </div><hr>
+          
+          {% endfor %}
+          {% endif %}
+          <!-- Checking for the total count of comments and giving a good condition for comment display -->
+          {% if post.total_number_of_comments >= 2 %}
+              <button class="btn btn-primary btn-sm">
+                Load Comments
+              </button>
+            </p>
+          {% else %}
+          {% endif %}
+        </div>
+
+
+          <!-- End of comment -->
+        </div>
           </div>
         </div>
       
@@ -81,4 +158,19 @@
 
 {% include 'group/snippets/group_follow.html' %}
 {% include 'snippets/prevent_page_reload.html' %}
+
+<script>
+  $(document).ready(function() {
+    let display = false;
+    $(".cmt-btn").click(function() {
+      if (display===false) {
+        $(this).next(".comment-box").show();
+        display=true
+      } else {
+        $(this).next(".comment-box").hide();
+        display=false
+      }
+    })
+  })
+</script>
 {% endblock content %}

@@ -11,6 +11,9 @@ from .views import (
                     PagePostLikeToggle,
                     PagePostLikeAPIToggle,
                     PagePostDetailView,
+                    PagePostCommentLikeToggle,
+                    PagePostCommentLikeAPIToggle,
+                    PagePostCommentDetailView,
                 )
 
 app_name = 'page'
@@ -28,7 +31,11 @@ urlpatterns = [
 
     # Page Post Like
     path('post/<id>/like/', PagePostLikeToggle.as_view(), name='page-post-like-toggle'),
-    path('post/api/<id>/like/', PagePostLikeAPIToggle.as_view(), name='page-post-like-api-toggle'),
-    
+    path('post/api/<id>/like/', PagePostLikeAPIToggle.as_view(), name='page-post-like-api-toggle'),   
     path('post/<int:pk>/', PagePostDetailView.as_view(), name='page-post-detail-view'),
+
+    # Group Post Comment Like and Comment Detail View
+    path('comment/<id>/like/', PagePostCommentLikeToggle.as_view(), name='page-post-comment-like-toggle'),
+    path('comment/api/<id>/like/', PagePostCommentLikeAPIToggle.as_view(), name='page-post-comment-like-api-toggle'),   
+    path('comment/<int:pk>/', PagePostCommentDetailView.as_view(), name='page-post-comment-detail-view'),  
 ]

@@ -3,6 +3,11 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
+<style>
+  .comment-box {
+    display: none;
+  }
+</style>
 
 <div class="container">
   <h2>{{ object.title }}</h2>
@@ -10,32 +15,30 @@
   <p>{{ object.description }}</p>
   <p>{{ object.owner.user.first_name }} {{ object.owner.user.last_name }}</p>
 
-  
-<p><a class='like-btn' 
-  data-href='{{ object.get_page_like_api_url }}' 
-  data-likes='{{ object.likes.count }}' 
-  href='{{ object.get_page_like_url }}'>
-  {{ object.likes.count }} 
-  {% if request.user.profile in object.likes.all %}Unlike{% else %}Like{% endif %}
-</a></p>
+
+  <p><a class='like-btn' data-href='{{ object.get_page_like_api_url }}' data-likes='{{ object.likes.count }}'
+      href='{{ object.get_page_like_url }}'>
+      {{ object.likes.count }}
+      {% if request.user.profile in object.likes.all %}Unlike{% else %}Like{% endif %}
+    </a></p>
 
 
-<!-- Users that like a post (THis should be in a popup modal)-->
+  <!-- Users that like a post (THis should be in a popup modal)-->
 
-{% comment %}
-<div class="bg-primary">
-  <h2>People Who like {{object.title}}</h2>
-  
-{% for profile in object.likes.all %}
-<p>{{ profile.user.first_name }} {{ profile.user.last_name }}</p>
-</div>
-{% endfor %}
-{% endcomment %}
-<!-- end Users that like a post -->
+  {% comment %}
+  <div class="bg-primary">
+    <h2>People Who like {{object.title}}</h2>
+
+    {% for profile in object.likes.all %}
+    <p>{{ profile.user.first_name }} {{ profile.user.last_name }}</p>
+  </div>
+  {% endfor %}
+  {% endcomment %}
+  <!-- end Users that like a post -->
 
 
   {% if object.owner == user.profile %}
-  <a href="{% url 'page:page-update-view' object.slug %}">Update</a><br><br><br><br>
+  <a href="{% url 'page:page-update-view' object.slug %}">Update</a><br>
   <a href="{% url 'page:page-delete-view' object.slug %}">Delete</a>
   {% endif %}
 
@@ -47,30 +50,144 @@
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
   {% endif %}
-  <div>
-    <h2>Posts</h2>
-    {% for post in page.posts.all %}
-    By - <b>{{post.author.user.first_name}} {{post.author.user.last_name}}</b><br>
-    {{post.content}}<br>
-    {{post.date_created}}
-    <div>
-    <p><a class='page-post-like-btn' data-href='{{ post.get_page_post_like_api_url }}' 
-      data-likes='{{ post.likes.count }}'  
-      href='{{ post.get_page_post_like_url }}'>{{ post.likes.count }}
+
+
+
+
+
+<div class="container post-container">
+  {% for post in page.posts.all %}
+  <div class="col-md-12 infinite-item">
+    <!-- <img class="img-fluid" src="https://picsum.photos/700"> -->
+    
+      <div class="card mb-4 box-shadow">
+        <div class="card-body container">
+
+          <div class="d-flex justify-content-between">
+            <div>
+              <a href="{% url 'account:user-account-view' user_id=post.author.user.pk %}">
+              <img class="d-block border border-dark rounded-circle img-fluid mx-auto profile-image" 
+                  alt="codingwithmitch logo" 
+                  id="id_profile_image" 
+                  src="{{post.author.user.profile_image.url}}" width="50px">
+                  </a>
+            </div>
+            
+            <a href="{% url 'account:user-account-view' user_id=post.author.user.pk %}">
+              <small class="text-muted author-name"><b>{{post.author.user.first_name}} {{post.author.user.last_name}}</b></small>
+          </a>
+            <small class="text-muted">{{post.date_created}}</small>
+          </div>
+          <div class="d-flex align-items-center">
+            <p>{{post.content}}</p>
+          </div>
+          <div>
+          <p><a class='like-btn' data-href='{{ post.get_page_post_like_api_url }}' 
+            data-likes='{{ post.likes.count }}'  
+            href='{{ post.get_page_post_like_url }}'>{{ post.likes.count }}
+            
+            {% if request.user.profile in post.likes.all %}
+                Unlike
+            {% else %}
+                Like
+            {% endif %}
+        </a></p>
+      </div>
       
-      {% if request.user.profile in post.likes.all %}
-          Unlike
-      {% else %}
-          Like
-      {% endif %}
-  </a></p>
-</div>
-    <hr>
-    {% endfor %}
+        <!-- start of comment -->
+        <!-- Checking for the total count of comments and giving a good condition for comment display -->
+        <div class="container">
+        {% if post.total_number_of_comments >= 2 %}
+            <button class="cmt-btn btn-primary btn-sm mb-2">
+              {{post.total_number_of_comments}} Comments
+            </button>
+          
+        
+        {% elif post.total_number_of_comments == 1 %}
+          <button class="cmt-btn btn-primary btn-sm mb-2">
+            {{post.total_number_of_comments}} Comment
+          </button>
+
+        {% else %}
+        <button class="btn-primary btn-sm mb-2">
+          {{post.total_number_of_comments}} Comments
+        </button>
+        {% endif %}
+
+
+          <div class="comment-box">                
+        <form action="" method="POST"class='ui fluid form'>
+            {% csrf_token %}
+            <input type="hidden" name="post_id" value={{obj.id}}>
+            <input type="text" placeholder="Add Comment...">
+            {{ c_form }}
+            <button type="submit" name="submit_c_form" class="btn btn-primary btn-sm">Send</button>
+        </form>
+            {% if post.comment_set.all %}
+        {% for comment in post.comment_set.all %}
+            <div class="pl-3">
+              <a href="{% url 'account:user-account-view' user_id=comment.user.user.id %}">
+                <img class="rounded-circle img-fluid" src="{{comment.user.user.profile_image.url}}" width="30px">
+                <span>
+                  <b>{{ comment.user.user.first_name }} {{ comment.user.user.last_name }}</b>
+                </a>
+                  <span>{{ comment.date_created|timesince }} ago</span>
+                </span>
+                <div class=''>{{ comment.body }}</div>
+                <!-- Beginning of Comment Likes -->
+                <div>
+                <p><a class='comment-like-btn' data-href='{{ comment.get_page_post_comment_like_api_url }}' 
+                  data-likes='{{ comment.likes.count }}'  
+                  href='{{ post.get_page_post_comment_like_url }}'>{{ comment.likes.count }}
+                  
+                  {% if request.user.profile in comment.likes.all %}
+                      Unlike
+                  {% else %}
+                      Like
+                  {% endif %}
+              </a></p>
+            </div>
+            <!-- End of Comment Likes -->
+            </div><hr>
+        
+        {% endfor %}
+        {% endif %}
+        <!-- Checking for the total count of comments and giving a good condition for comment display -->
+        {% if post.total_number_of_comments >= 2 %}
+            <button class="btn btn-primary btn-sm">
+              Load Comments
+            </button>
+          </p>
+        {% else %}
+        {% endif %}
+      </div>
+
+
+        <!-- End of comment -->
+      </div>
+        </div>
+      </div>
+    
   </div>
+  {% endfor %}
 </div>
 
+  {% include 'page/snippets/page_like.html' %}
+  {% include 'snippets/prevent_page_reload.html' %}
 
-{% include 'page/snippets/page_like.html' %}
-{% include 'snippets/prevent_page_reload.html' %}
-{% endblock content %}
+
+  <script>
+    $(document).ready(function () {
+      let display = false;
+      $(".cmt-btn").click(function () {
+        if (display === false) {
+          $(this).next(".comment-box").show();
+          display = true
+        } else {
+          $(this).next(".comment-box").hide();
+          display = false
+        }
+      })
+    })
+  </script>
+  {% endblock content %}

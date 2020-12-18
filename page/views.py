@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from .models import Page, Post
+from .models import Page, Post, Comment
 from .forms import PostCreateForm
 from django.urls import reverse_lazy, reverse
 from account.models import Profile
@@ -168,3 +168,49 @@ class PagePostLikeAPIToggle(APIView):
 class PagePostDetailView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = "page/post_detail.html"
+
+
+class PagePostCommentLikeToggle(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        id_ = self.kwargs.get("id")
+        obj = get_object_or_404(Comment, id=id_)
+        url_ = obj.get_absolute_url()
+        user = self.request.user.profile
+        if self.request.user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+            else:
+                obj.likes.ad(user)
+        return url_
+
+    
+class PagePostCommentLikeAPIToggle(APIView):
+    authentication_classes = (authentication.SessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, id=None, format=None):
+        obj = get_object_or_404(Comment, id=id)
+        url_ = obj.get_absolute_url()
+        user = self.request.user.profile
+        updated = False
+        liked = False
+        if self.request.user.is_authenticated:
+            if user in obj.likes.all():
+                liked = False
+                obj.likes.remove(user)
+            else:
+                liked = True
+                obj.likes.add(user)
+            updated = True
+        likescount = obj.likes.count()
+        data = {
+            "updated": updated,
+            "liked": liked,
+            "likescount": likescount,
+        }
+        return Response(data)
+
+
+class PagePostCommentDetailView(LoginRequiredMixin, DetailView):
+    model = Comment
+    template_name = "page/post_comment_detail.html"

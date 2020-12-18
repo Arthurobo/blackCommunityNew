@@ -1,6 +1,5 @@
-from .models import Group, Post
+from .models import Group, Post, Comment
 from django import forms
-
 
 
 class GroupCreateForm(forms.ModelForm):
@@ -16,3 +15,12 @@ class GroupPostCreateForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('content',)
+
+
+class GroupPostCommentForm(forms.ModelForm):
+    body = forms.CharField(label='',
+                            widget=forms.TextInput(attrs={'placeholder': "Add a comment..."}))
+
+    class Meta:
+        model = Comment
+        fields = ('body',)

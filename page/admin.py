@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import Page, Post#, Like
+from .models import Page, Post, Comment
 
 admin.site.register(Page)
 admin.site.register(Post)
-#admin.site.register(Like)
+admin.site.register(Comment)
