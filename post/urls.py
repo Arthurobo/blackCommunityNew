@@ -1,8 +1,9 @@
-# from django.urls import path
-# from .views import like_unlike_post
+from django.urls import path
+from .views import MainView, PostJsonListView
 
-# app_name = 'posts'
+app_name = 'posts'
 
-# urlpatterns = [
-#     path('liked/', like_unlike_post, name='like-post-view'),
-# ]
+urlpatterns = [
+    path('list/', MainView.as_view(), name='main-view'),
+    path('post-json/<int:num_posts>/', PostJsonListView.as_view(), name='posts-json-view'),
+]

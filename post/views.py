@@ -1,44 +1,25 @@
-# from django.shortcuts import render, redirect
-# from django.urls import reverse_lazy
-# from .models import Post, Like
-# from account.models import Profile
-# from django.views.generic import UpdateView, DeleteView
-# from django.contrib import messages
-# from django.http import JsonResponse
-# from django.contrib.auth.decorators import login_required
-# from django.contrib.auth.mixins import LoginRequiredMixin
-# # Create your views here.
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from .models import Post
+from account.models import Profile
+from django.views.generic import UpdateView, DeleteView, View, TemplateView
+from django.contrib import messages
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+# Create your views here.
 
-# @login_required
-# def like_unlike_post(request):
-#     user = request.user
-#     if request.method == 'POST':
-#         post_id = request.POST.get('post_id')
-#         post_obj = Post.objects.get(id=post_id)
-#         profile = Profile.objects.get(user=user)
+class MainView(TemplateView):
+    template_name = 'post/main.html'
 
-#         if profile in post_obj.liked.all():
-#             post_obj.liked.remove(profile)
-#         else:
-#             post_obj.liked.add(profile)
 
-#         like, created = Like.objects.get_or_create(user=profile, post_id=post_id)
 
-#         if not created:
-#             if like.value=='Like':
-#                 like.value='Unlike'
-#             else:
-#                 like.value='Like'
-#         else:
-#             like.value='Like'
-
-#             post_obj.save()
-#             like.save()
-
-#         # data = {
-#         #     'value': like.value,
-#         #     'likes': post_obj.liked.all().count()
-#         # }
-
-#         # return JsonResponse(data, safe=False)
-#     return redirect('/')
+class PostJsonListView(View):
+    def get(self, *args, **kwargs):
+        print(kwargs)
+        upper = kwargs.get('num_posts')
+        lower = upper - 3
+        posts = list(Post.objects.values()[lower:upper])
+        posts_size = len(Post.objects.all())
+        max_size = True if upper >= posts_size else False
+        return JsonResponse({'data': posts, 'max': max_size}, safe=True)

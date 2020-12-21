@@ -17,30 +17,9 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions
 
 
-# def group_list(request):
-#     groups = Group.objects.all()
-#     paginator = Paginator(groups, 6)
-#     page = request.GET.get('page')
-
-#     try:
-#         images = paginator.page(page)
-#     except PageNotAnInteger:
-#         # If page is not an integer deliver the first page
-#         images = paginator.page(1)
-#     except EmptyPage:
-#         if request.is_ajax():
-#             # If the request is AJAX and the page is out of range
-#             # return an empty page
-#             return HttpResponse('')
-#         images = paginator.page(paginator.num_pages)
-#     if request.is_ajax():
-#         return render(request, "group/group_list_ajax.html", {'section': 'groups', 'groups': groups })
-#     return render(request, "group/group_list.html", {'section': 'groups', 'groups': groups })
-
-
 class GroupListView(LoginRequiredMixin, ListView):
     model = Group
-    paginate_by = 8
+    paginate_by = 10
     context_object_name = 'groups'
     template_name = 'group/group_list.html'
     ordering = ['-date_created']
@@ -83,6 +62,18 @@ class GroupDetailView(LoginRequiredMixin, FormMixin, DetailView):
         context = super(GroupDetailView, self).get_context_data()
         group = get_object_or_404(Group, id=self.kwargs['pk'])
         return context
+    
+    # def get_context_data(self, request, *args, **kwargs):
+    #     context = super(GroupDetailView, self).get_context_data()
+    #     _list = Post.objects.all()
+    #     paginator = Paginator(_list, 5)
+    #     page = request.GET.get('page')
+    #     context['posts'] = paginator.get_page(page)
+    #     group = get_object_or_404(Group, id=self.kwargs['pk'])
+        
+    #     return context
+
+
 
 
 class GroupFollowToggle(RedirectView):

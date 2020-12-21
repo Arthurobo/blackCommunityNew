@@ -28,7 +28,7 @@ urlpatterns = [
     path('', include('personal.urls', namespace='personal')),
     path('', include('page.urls', namespace='page')),
     path('group/', include('group.urls', namespace='group')),
-    #path('post/', include('post.urls', namespace='post')),
+    path('post/', include('post.urls', namespace='post')),
     # Search View
 #    path('search/', account_search_view, name="search"),
 
